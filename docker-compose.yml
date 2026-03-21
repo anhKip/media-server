@@ -1,0 +1,13 @@
+version: '3.8'
+
+services:
+  upload-service:
+    build:
+      context: .   # Build context is the root to allow copying common root files (settings.gradle)
+      dockerfile: ./upload-service/Dockerfile
+    container_name: upload-service
+    ports:
+      - "8081:8081" # Map host port 8081 to container port 8081
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+    restart: unless-stopped
