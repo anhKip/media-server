@@ -1,7 +1,11 @@
 # Stage 1: Build the upload-service
-FROM gradle:8.7-jdk17-alpine AS build
+FROM eclipse-temurin:17-jdk-alpine AS build
 
 WORKDIR /app
+
+# Copy gradle wrapper and related files
+COPY gradlew .
+COPY gradle ./gradle
 
 # Copy root Gradle files and settings
 COPY settings.gradle build.gradle ./
@@ -10,8 +14,8 @@ COPY settings.gradle build.gradle ./
 COPY upload-service/build.gradle ./upload-service/
 COPY upload-service/src ./upload-service/src/
 
-# Build the Spring Boot executable JAR
-RUN gradle :upload-service:bootJar --no-daemon
+# Ensure wrapper script is executable, then build the executable JAR
+RUN chmod +x ./gradlew && ./gradlew :upload-service:bootJar --no-daemon
 
 # Stage 2: Create the minimal runtime image
 FROM eclipse-temurin:17-jre-alpine
