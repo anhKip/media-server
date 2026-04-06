@@ -4,3 +4,6 @@ spring:
 
 server:
   port: 8081
+
+storage:
+  location: ${STORAGE_LOCATION:/app/data/archive1}
