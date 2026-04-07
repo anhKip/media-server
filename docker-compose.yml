@@ -6,7 +6,9 @@ services:
     container_name: upload-service
     ports:
       - "8081:8081" # Map host port 8081 to container port 8081
+    volumes:
+      - ${STORAGE_LOCATION}:/app/data
     environment:
       - SPRING_PROFILES_ACTIVE=docker
-      - STORAGE_LOCATION=${STORAGE_LOCATION}
+      - STORAGE_LOCATION=/app/data
     restart: unless-stopped

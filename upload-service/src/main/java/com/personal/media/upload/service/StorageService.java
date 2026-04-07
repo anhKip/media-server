@@ -15,12 +15,12 @@ import java.nio.file.StandardCopyOption;
 import java.util.UUID;
 
 @Service
-public class FileSystemStorageService {
+public class StorageService {
 
     private final Path rootLocation;
 
     @Autowired
-    public FileSystemStorageService(StorageProperties properties) {
+    public StorageService(StorageProperties properties) {
         if (properties.getLocation().trim().isEmpty()) {
             throw new StorageException("File upload location can not be Empty.");
         }
