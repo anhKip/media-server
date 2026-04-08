@@ -20,12 +20,8 @@ public class UploadController {
         this.storageService = storageService;
     }
 
-    @PostMapping("/upload")
+    @PostMapping("")
     public ResponseEntity<UploadResponseDTO> uploadFile(@RequestParam("file") MultipartFile file) {
-        if (file.isEmpty()) {
-            return ResponseEntity.badRequest().body(new UploadResponseDTO("", "", "File is empty. Please select a valid file.", "FAILED", 0));
-        }
-
         String filePath = storageService.store(file);   
 
         UploadResponseDTO response = new UploadResponseDTO(filePath, file.getOriginalFilename(), "File uploaded successfully", "SUCCESS", file.getSize());
