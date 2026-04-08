@@ -12,7 +12,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -20,7 +20,7 @@ import java.util.UUID;
 public class StorageService {
 
     private final Path rootLocation;
-    private static final List<String> ALLOWED_EXTENSIONS = Arrays.asList("jpg", "jpeg", "png", "heic", "webp");
+    private final List<String> allowedExtensions = new ArrayList<>();
 
     @Autowired
     public StorageService(StorageProperties properties) {
@@ -29,6 +29,7 @@ public class StorageService {
         }
 
         this.rootLocation = Paths.get(properties.getLocation());
+        this.allowedExtensions.addAll(properties.getAllowedExtensions());
         init();
     }
 
@@ -53,7 +54,7 @@ public class StorageService {
                 throw new StorageException("Invalid file name.");
             }
             extension = originalFilename.substring(originalFilename.lastIndexOf(".") + 1).toLowerCase();
-            if (!ALLOWED_EXTENSIONS.contains(extension)) {
+            if (!allowedExtensions.contains(extension)) {
                 throw new StorageException("Invalid file extension.");
             }
             

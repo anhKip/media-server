@@ -11,3 +11,4 @@ server:
 
 storage:
   location: ${STORAGE_LOCATION:/app/data/archive1}
+  allowed-extensions: ["jpg", "jpeg", "png", "heic", "webp"]
