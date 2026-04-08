@@ -12,12 +12,15 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
 
 @Service
 public class StorageService {
 
     private final Path rootLocation;
+    private static final List<String> ALLOWED_EXTENSIONS = Arrays.asList("jpg", "jpeg", "png", "heic", "webp");
 
     @Autowired
     public StorageService(StorageProperties properties) {
@@ -43,13 +46,19 @@ public class StorageService {
                 throw new StorageException("Failed to store empty file.");
             }
             String originalFilename = file.getOriginalFilename();
+
+            // Check valid file name and extension
             String extension = "";
-            if (originalFilename != null && originalFilename.contains(".")) {
-                extension = originalFilename.substring(originalFilename.lastIndexOf("."));
+            if (originalFilename == null || !originalFilename.contains(".")) {
+                throw new StorageException("Invalid file name.");
+            }
+            extension = originalFilename.substring(originalFilename.lastIndexOf(".") + 1).toLowerCase();
+            if (!ALLOWED_EXTENSIONS.contains(extension)) {
+                throw new StorageException("Invalid file extension.");
             }
             
             // Generate a unique filename to avoid overriding
-            String newFilename = UUID.randomUUID() + extension;
+            String newFilename = UUID.randomUUID() + "." + extension;
             Path destinationFile = this.rootLocation.resolve(
                     Paths.get(newFilename))
                     .normalize().toAbsolutePath();
