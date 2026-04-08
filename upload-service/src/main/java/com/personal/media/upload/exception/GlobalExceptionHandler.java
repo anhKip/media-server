@@ -17,4 +17,10 @@ public class GlobalExceptionHandler {
         UploadResponseDTO response = new UploadResponseDTO("", "", "File size exceeds the maximum allowed size (10MB).", "FAILED", 0);
         return ResponseEntity.status(HttpStatus.PAYLOAD_TOO_LARGE).body(response);
     }
+
+    @ExceptionHandler(StorageException.class)
+    public ResponseEntity<UploadResponseDTO> handleStorageException(StorageException ex) {
+        UploadResponseDTO response = new UploadResponseDTO("", "", ex.getMessage(), "FAILED", 0);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+    }
 }
