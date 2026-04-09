@@ -1,14 +1,34 @@
 services:
   upload-service:
     build:
-      context: .   # Build context is the root to allow copying common root files (settings.gradle)
+      context: .
       dockerfile: ./upload-service/Dockerfile
     container_name: upload-service
     ports:
-      - "8081:8081" # Map host port 8081 to container port 8081
+      - "8081:8081"
     volumes:
       - ${STORAGE_LOCATION}:/app/data
     environment:
       - SPRING_PROFILES_ACTIVE=docker
       - STORAGE_LOCATION=/app/data
+      - RABBITMQ_HOST=rabbitmq
+      - RABBITMQ_PORT=5672
+    restart: unless-stopped
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      - RABBITMQ_DEFAULT_USER=guest
+      - RABBITMQ_DEFAULT_PASS=guest
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
     restart: unless-stopped
