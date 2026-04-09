@@ -1,6 +1,14 @@
 spring:
   application:
     name: upload-service
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 11MB
 
 server:
   port: 8081
+
+storage:
+  location: ${STORAGE_LOCATION:/app/data/archive1}
+  allowed-extensions: ["jpg", "jpeg", "png", "heic", "webp"]
