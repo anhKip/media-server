@@ -1,6 +1,7 @@
 package com.personal.media.upload.service;
 
 import com.personal.media.upload.config.StorageProperties;
+import com.personal.media.upload.exception.InvalidFileException;
 import com.personal.media.upload.exception.StorageException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -44,18 +45,18 @@ public class StorageService {
     public String store(MultipartFile file) {
         try {
             if (file.isEmpty()) {
-                throw new StorageException("Failed to store empty file.");
+                throw new InvalidFileException("Failed to store empty file.");
             }
             String originalFilename = file.getOriginalFilename();
 
             // Check valid file name and extension
             String extension = "";
             if (originalFilename == null || !originalFilename.contains(".")) {
-                throw new StorageException("Invalid file name.");
+                throw new InvalidFileException("Invalid file name.");
             }
             extension = originalFilename.substring(originalFilename.lastIndexOf(".") + 1).toLowerCase();
             if (!allowedExtensions.contains(extension)) {
-                throw new StorageException("Invalid file extension.");
+                throw new InvalidFileException("Invalid file extension.");
             }
             
             // Generate a unique filename to avoid overriding
@@ -65,7 +66,6 @@ public class StorageService {
                     .normalize().toAbsolutePath();
                     
             if (!destinationFile.getParent().equals(this.rootLocation.toAbsolutePath())) {
-                // This is a security check to prevent directory traversal attacks
                 throw new StorageException(
                         "Cannot store file outside current directory.");
             }
