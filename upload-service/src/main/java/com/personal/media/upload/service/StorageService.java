@@ -16,6 +16,7 @@ import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import jakarta.annotation.PostConstruct;
 
 @Service
 public class StorageService {
@@ -31,14 +32,14 @@ public class StorageService {
 
         this.rootLocation = Paths.get(properties.getLocation());
         this.allowedExtensions.addAll(properties.getAllowedExtensions());
-        init();
     }
 
+    @PostConstruct
     public void init() {
         try {
             Files.createDirectories(rootLocation);
         } catch (IOException e) {
-            throw new StorageException("Could not initialize storage", e);
+            throw new StorageException("Could not initialize storage.", e);
         }
     }
 
