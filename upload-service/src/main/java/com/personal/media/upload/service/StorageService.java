@@ -1,8 +1,12 @@
 package com.personal.media.upload.service;
 
+import com.personal.media.common.dto.PhotoEventMsg;
+import com.personal.media.upload.config.RabbitMQConfig;
 import com.personal.media.upload.config.StorageProperties;
 import com.personal.media.upload.exception.InvalidFileException;
 import com.personal.media.upload.exception.StorageException;
+
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -23,15 +27,17 @@ public class StorageService {
 
     private final Path rootLocation;
     private final List<String> allowedExtensions = new ArrayList<>();
+    private final RabbitTemplate rabbitTemplate;
 
     @Autowired
-    public StorageService(StorageProperties properties) {
+    public StorageService(StorageProperties properties, RabbitTemplate rabbitTemplate) {
         if (properties.getLocation().trim().isEmpty()) {
             throw new StorageException("File upload location can not be Empty.");
         }
 
         this.rootLocation = Paths.get(properties.getLocation());
         this.allowedExtensions.addAll(properties.getAllowedExtensions());
+        this.rabbitTemplate = rabbitTemplate;
     }
 
     @PostConstruct
@@ -73,8 +79,16 @@ public class StorageService {
             try (InputStream inputStream = file.getInputStream()) {
                 Files.copy(inputStream, destinationFile,
                         StandardCopyOption.REPLACE_EXISTING);
-                return newFilename;
             }
+
+            // Prepare message
+            PhotoEventMsg message = new PhotoEventMsg(newFilename, destinationFile.toString(), file.getSize());
+
+            // Send message
+            rabbitTemplate.convertAndSend(RabbitMQConfig.PHOTO_EXCHANGE, RabbitMQConfig.PHOTO_ROUTING_KEY, message);
+
+            return newFilename;
+
         } catch (IOException e) {
             throw new StorageException("Failed to store file.", e);
         }
