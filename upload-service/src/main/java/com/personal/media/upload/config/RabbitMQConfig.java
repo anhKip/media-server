@@ -38,11 +38,4 @@ public class RabbitMQConfig {
     public MessageConverter messageConverter() {
         return new Jackson2JsonMessageConverter();
     }
-
-    @Bean
-    public AmqpTemplate rabbitTemplate(ConnectionFactory connectionFactory) {
-        final RabbitTemplate rabbitTemplate = new RabbitTemplate(connectionFactory);
-        rabbitTemplate.setMessageConverter(messageConverter());
-        return rabbitTemplate;
-    }
 }
