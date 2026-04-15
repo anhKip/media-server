@@ -7,10 +7,10 @@ services:
     ports:
       - "8081:8081"
     volumes:
-      - ${STORAGE_LOCATION}:/app/data
+      - ${STORAGE_LOCATION}:/app/data/archive1
     environment:
       - SPRING_PROFILES_ACTIVE=docker
-      - STORAGE_LOCATION=/app/data
+      - STORAGE_LOCATION=/app/data/archive1
       - RABBITMQ_HOST=rabbitmq
       - RABBITMQ_PORT=5672
     restart: unless-stopped
@@ -25,11 +25,11 @@ services:
       - "8082:8082"
     volumes:
       - ${STORAGE_LOCATION}:/app/data
-      - ${ARCHIVE_LOCATION}:/mnt/cold_storage
+      - ${ARCHIVE_LOCATION}:/app/data/archive2
     environment:
       - SPRING_PROFILES_ACTIVE=docker
       - STORAGE_LOCATION=/app/data
-      - ARCHIVE_LOCATION=/mnt/cold_storage
+      - ARCHIVE_LOCATION=/app/data/archive2
       - RABBITMQ_HOST=rabbitmq
       - RABBITMQ_PORT=5672
     restart: unless-stopped

@@ -9,3 +9,6 @@ spring:
 
 server:
   port: 8082
+
+archive:
+  location: ${ARCHIVE_LOCATION:/app/data/archive2}
