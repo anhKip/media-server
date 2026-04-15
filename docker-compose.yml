@@ -16,6 +16,25 @@ services:
     restart: unless-stopped
     depends_on:
       - rabbitmq
+  archive-service:
+    build:
+      context: .
+      dockerfile: ./archive-service/Dockerfile
+    container_name: archive-service
+    ports:
+      - "8082:8082"
+    volumes:
+      - ${STORAGE_LOCATION}:/app/data
+      - ${ARCHIVE_LOCATION}:/mnt/cold_storage
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - STORAGE_LOCATION=/app/data
+      - ARCHIVE_LOCATION=/mnt/cold_storage
+      - RABBITMQ_HOST=rabbitmq
+      - RABBITMQ_PORT=5672
+    restart: unless-stopped
+    depends_on:
+      - rabbitmq
   rabbitmq:
     image: rabbitmq:3-management-alpine
     container_name: rabbitmq

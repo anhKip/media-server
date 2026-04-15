@@ -2,3 +2,4 @@ rootProject.name = 'media-server'
 
 include 'common'
 include 'upload-service'
+include 'archive-service'
