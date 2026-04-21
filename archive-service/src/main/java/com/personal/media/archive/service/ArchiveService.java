@@ -12,24 +12,35 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.annotation.PostConstruct;
 
 @Service
 public class ArchiveService {
 
-    private final ArchiveProperties archiveProperties;
+    private final String archiveLocation;
     private static final Logger log = LoggerFactory.getLogger(ArchiveService.class);
 
+    @Autowired
     public ArchiveService(ArchiveProperties archiveProperties) {
-        this.archiveProperties = archiveProperties;
+        this.archiveLocation = archiveProperties.getArchiveLocation();    }
+
+    @PostConstruct
+    public void init() {
+        try {
+            Files.createDirectories(Paths.get(archiveLocation));
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to initialize storage", e);
+        }
     }
     
     @RabbitListener(queues = RabbitMQConfig.PHOTO_QUEUE)
     public void processArchive(PhotoEventMsg msg) {
-        log.info("Received archive request for file: {}", msg.getFileName());
+        log.info("Received archive request for file: {}", msg.getFileId());
         try {
             Path source = Paths.get(msg.getTempLocation());
-            Path destination = Paths.get(archiveProperties.getArchiveLocation());
-            Path file = source.resolve(msg.getFileName());
+            Path destination = Paths.get(archiveLocation);
+            Path file = source.resolve(msg.getFileId());
 
             if (!Files.exists(destination)) {
                 Files.createDirectories(destination);
@@ -38,7 +49,7 @@ public class ArchiveService {
 
             log.info("Archived file {} to {}", file, destination);
         } catch (IOException e) {
-            log.error("Failed to archive file {}. Error: {}", msg.getFileName(), e.getMessage());
+            log.error("Failed to archive file {}. Error: {}", msg.getFileId(), e.getMessage());
         }
     }
 }

@@ -28,7 +28,6 @@ services:
       - ${ARCHIVE_LOCATION}:/app/data/archive2
     environment:
       - SPRING_PROFILES_ACTIVE=docker
-      - STORAGE_LOCATION=/app/data
       - ARCHIVE_LOCATION=/app/data/archive2
       - RABBITMQ_HOST=rabbitmq
       - RABBITMQ_PORT=5672
