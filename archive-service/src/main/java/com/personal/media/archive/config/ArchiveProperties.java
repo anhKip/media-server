@@ -2,15 +2,15 @@ package com.personal.media.archive.config;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
-@ConfigurationProperties("archive")
+@ConfigurationProperties(prefix="archive")
 public class ArchiveProperties {
-    private String archiveLocation;
+    private String location;
 
-    public String getArchiveLocation() {
-        return archiveLocation;
+    public String getLocation() {
+        return location;
     }
 
-    public void setArchiveLocation(String archiveLocation) {
-        this.archiveLocation = archiveLocation;
+    public void setLocation(String location) {
+        this.location = location;
     }
 }

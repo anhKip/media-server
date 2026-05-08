@@ -23,15 +23,28 @@ public class ArchiveService {
 
     @Autowired
     public ArchiveService(ArchiveProperties archiveProperties) {
-        this.archiveLocation = archiveProperties.getArchiveLocation();    }
+        this.archiveLocation = archiveProperties.getLocation();    }
 
     @PostConstruct
     public void init() {
-        try {
-            Files.createDirectories(Paths.get(archiveLocation));
-        } catch (IOException e) {
-            throw new RuntimeException("Failed to initialize storage", e);
+        // Defensive check: don't let it reach Paths.get() if it's null
+        if (this.archiveLocation == null) {
+            log.error("❌ CRITICAL: archive.location is NULL. Check your application.yml and .env mapping.");
+            throw new IllegalStateException("Archive storage path is not configured!");
         }
+
+        try {
+            Path path = Paths.get(this.archiveLocation);
+            log.info("🚀 Initializing storage at: {}", path.toAbsolutePath());
+            Files.createDirectories(path);
+        } catch (IOException e) {
+            throw new RuntimeException("Could not initialize storage directory", e);
+        }
+        // try {
+        //     Files.createDirectories(Paths.get(archiveLocation));
+        // } catch (IOException e) {
+        //     throw new RuntimeException("Failed to initialize storage", e);
+        // }
     }
     
     @RabbitListener(queues = RabbitMQConfig.PHOTO_QUEUE)
